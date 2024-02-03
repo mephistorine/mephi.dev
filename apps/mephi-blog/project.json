@@ -1,0 +1,73 @@
+{
+  "name": "mephi-blog",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "mephi-blog",
+  "sourceRoot": "apps/mephi-blog/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mephi-blog",
+        "index": "apps/mephi-blog/src/index.html",
+        "browser": "apps/mephi-blog/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/mephi-blog/tsconfig.app.json",
+        "assets": [
+          "apps/mephi-blog/src/favicon.ico",
+          "apps/mephi-blog/src/assets"
+        ],
+        "styles": ["apps/mephi-blog/src/styles.css"],
+        "scripts": [],
+        "server": "apps/mephi-blog/src/main.server.ts",
+        "prerender": true,
+        "ssr": {
+          "entry": "apps/mephi-blog/server.ts"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "mephi-blog:build:production"
+        },
+        "development": {
+          "buildTarget": "mephi-blog:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "mephi-blog:build"
+      }
+    }
+  }
+}
