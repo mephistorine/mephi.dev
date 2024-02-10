@@ -1,0 +1,32 @@
+<div class="flex flex-col rounded-md border border-zinc-300 text-zinc-900 dark:border-zinc-700 dark:text-zinc-200 ring-blue-500 focus-within:ring-2">
+  <header class="flex justify-between rounded-t-md border-b border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
+    <ul class="-mb-[1px] -ml-[1px] -mt-[1px] flex">
+      @for (tab of tabList; track tab) {
+        <li>
+          <button
+            type="button"
+            class="rounded-t-md border border-b-0 border-transparent px-4 py-3 leading-none ring-0 aria-selected:border-zinc-300 aria-selected:bg-zinc-50 aria-selected:dark:border-zinc-700 aria-selected:dark:bg-zinc-900"
+            [attr.aria-selected]="selectedTab() === tab"
+            (click)="selectedTab.set(tab)"
+          >
+            {{tabsByName[tab]}}
+          </button>
+        </li>
+      }
+    </ul>
+  </header>
+
+  @switch (selectedTab()) {
+    @case ("SOURCE") {
+      <textarea
+        [value]="value()"
+        (input)="onInput($event)"
+        (focus)="markAsTouched()"
+        class="min-h-[30rem] w-full flex-grow resize-y rounded-b-md bg-zinc-50 p-4 font-mono text-sm ring-0 dark:bg-zinc-900 focus:outline-0"
+      ></textarea>
+    }
+    @case ("RESULT") {
+      <div class="prose min-h-[30rem] max-h-[50rem] overflow-y-auto bg-zinc-50 p-4 dark:bg-zinc-900" [innerHTML]="previewValue()"></div>
+    }
+  }
+</div>

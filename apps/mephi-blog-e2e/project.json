@@ -4,5 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/mephi-blog-e2e/src",
   "targets": {},
-  "implicitDependencies": ["mephi-blog"]
+  "implicitDependencies": [
+    "mephi-blog"
+  ]
 }

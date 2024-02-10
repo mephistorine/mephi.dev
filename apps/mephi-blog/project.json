@@ -2,24 +2,30 @@
   "name": "mephi-blog",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "mephi-blog",
+  "prefix": "mephi",
   "sourceRoot": "apps/mephi-blog/src",
   "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/mephi-blog",
         "index": "apps/mephi-blog/src/index.html",
         "browser": "apps/mephi-blog/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/mephi-blog/tsconfig.app.json",
         "assets": [
           "apps/mephi-blog/src/favicon.ico",
           "apps/mephi-blog/src/assets"
         ],
-        "styles": ["apps/mephi-blog/src/styles.css"],
+        "styles": [
+          "apps/mephi-blog/src/styles.css"
+        ],
         "scripts": [],
         "server": "apps/mephi-blog/src/main.server.ts",
         "prerender": true,

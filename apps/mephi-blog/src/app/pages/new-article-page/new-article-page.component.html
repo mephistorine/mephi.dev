@@ -1,0 +1,25 @@
+<header>
+  <div class="container mx-auto px-4 sm:px-0">
+    Hello
+  </div>
+</header>
+
+<main>
+  <div class="container mx-auto px-4 sm:px-0">
+    <h1 class="font-bold text-4xl">New article</h1>
+
+    <form [formGroup]="form" class="flex flex-col gap-4" (submit.prevent)="onSubmitForm()">
+      <div class="flex flex-col">
+        <label for="title">Title</label>
+        <input formControlName="title" id="title" type="text" class="appearance-none bg-transparent rounded-md border border-zinc-300 px-3 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+      </div>
+
+      <div class="flex flex-col">
+        <label>Content</label>
+        <ui-editor formControlName="content"></ui-editor>
+      </div>
+
+      <button type="submit" class="w-fit rounded-md bg-indigo-700 hover:bg-indigo-600 px-3 py-1 text-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-500">Save</button>
+    </form>
+  </div>
+</main>

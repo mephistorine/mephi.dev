@@ -1,0 +1,9 @@
+{
+  "name": "shared-ui-editor",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui-editor/src",
+  "prefix": "ui",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}
