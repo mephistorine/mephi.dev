@@ -1,0 +1,9 @@
+{
+  "name": "shared-util-ssr",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/util-ssr/src",
+  "prefix": "util",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

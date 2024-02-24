@@ -1,7 +1,8 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from "@angular/core"
-import {toSignal} from "@angular/core/rxjs-interop"
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms"
+import {ChangeDetectionStrategy, Component, inject, signal} from "@angular/core"
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from "@angular/forms"
 import {UiEditorComponent} from "@mephi-blog/shared/ui-editor"
+import {injectPocketbaseClient, PocketbaseClient} from "@mephi-blog/shared/util-pocketbase"
+import slug from "slug"
 
 const TEST_MARKDOWN = `Marked - Markdown Parser
 ========================
@@ -48,29 +49,33 @@ Ready to start writing?  Either start changing stuff on the left or
   standalone: true,
   templateUrl: "./new-article-page.component.html",
   styleUrl: "./new-article-page.component.css",
-  imports: [
-    UiEditorComponent,
-    ReactiveFormsModule
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [UiEditorComponent, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {ngSkipHydration: 'true'}
 })
 export class NewArticlePageComponent {
-  private readonly formBuilder = inject(FormBuilder).nonNullable
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder)
+  private readonly pocketbaseClient: PocketbaseClient = injectPocketbaseClient()
+
+  protected readonly isLoading = signal(false)
 
   protected readonly form = this.formBuilder.group({
-    title: ['', [Validators.required]],
+    title: ["", [Validators.required]],
     content: [TEST_MARKDOWN, [Validators.required]]
   })
 
-  constructor() {
-    const formValue = toSignal(this.form.valueChanges, {initialValue: this.form.getRawValue()})
-
-    effect(() => {
-      console.log(formValue())
-    })
-  }
-
   protected onSubmitForm(): void {
+    const {title, content} = this.form.value as {title: string; content: string}
+    const user = this.pocketbaseClient.authStore.model as any
 
+    this.isLoading.set(true)
+    this.pocketbaseClient.collection("articles")
+      .create({
+        title,
+        content,
+        slug: slug(title),
+        userId: user.id
+      })
+      .finally(() => this.isLoading.set(false))
   }
 }

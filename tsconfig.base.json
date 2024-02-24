@@ -15,7 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@mephi-blog/shared/ui-editor": ["libs/shared/ui-editor/src/index.ts"]
+      "@mephi-blog/shared/ui-editor": ["libs/shared/ui-editor/src/index.ts"],
+      "@mephi-blog/shared/util-pocketbase": ["libs/shared/util-pocketbase/src/index.ts"],
+      "@mephi-blog/shared/util-signal": ["libs/shared/util-signal/src/index.ts"],
+      "@mephi-blog/shared/util-ssr": ["libs/shared/util-ssr/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

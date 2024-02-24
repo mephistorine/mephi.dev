@@ -1,0 +1,9 @@
+{
+  "name": "shared-util-signal",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/util-signal/src",
+  "prefix": "util",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

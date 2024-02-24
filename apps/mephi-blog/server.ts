@@ -1,5 +1,6 @@
 import {APP_BASE_HREF} from "@angular/common"
 import {CommonEngine} from "@angular/ssr"
+import {REQUEST} from "@mephi-blog/shared/util-ssr"
 import express from "express"
 import {dirname, join, resolve} from "node:path"
 import {fileURLToPath} from "node:url"
@@ -12,9 +13,7 @@ export function app(): express.Express {
   const browserDistFolder = resolve(serverDistFolder, "../browser")
   const indexHtml = join(serverDistFolder, "index.server.html")
 
-  const commonEngine = new CommonEngine({
-    enablePerformanceProfiler: true
-  })
+  const commonEngine = new CommonEngine()
 
   server.set("view engine", "html")
   server.set("views", browserDistFolder)
@@ -29,30 +28,6 @@ export function app(): express.Express {
     })
   )
 
-/*  server.get("rss", (req, res, next) => {
-    res.setHeader("Content-Type", "application/xml; charset=utf-8")
-    res.send(`<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
-
-<channel>
-  <title>W3Schools Home Page</title>
-  <link>https://www.w3schools.com</link>
-  <description>Free web building tutorials</description>
-  <item>
-    <title>RSS Tutorial</title>
-    <link>https://www.w3schools.com/xml/xml_rss.asp</link>
-    <description>New RSS tutorial on W3Schools</description>
-  </item>
-  <item>
-    <title>XML Tutorial</title>
-    <link>https://www.w3schools.com/xml</link>
-    <description>New XML tutorial on W3Schools</description>
-  </item>
-</channel>
-
-</rss>`)
-  })*/
-
   // All regular routes use the Angular engine
   server.get("*", (req, res, next) => {
     const {protocol, originalUrl, baseUrl, headers} = req
@@ -63,7 +38,10 @@ export function app(): express.Express {
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-        providers: [{provide: APP_BASE_HREF, useValue: baseUrl}]
+        providers: [
+          {provide: APP_BASE_HREF, useValue: baseUrl},
+          {provide: REQUEST, useValue: req}
+        ]
       })
       .then((html) => res.send(html))
       .catch((err) => next(err))

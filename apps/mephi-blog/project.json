@@ -28,7 +28,7 @@
         ],
         "scripts": [],
         "server": "apps/mephi-blog/src/main.server.ts",
-        "prerender": true,
+        "prerender": false,
         "ssr": {
           "entry": "apps/mephi-blog/server.ts"
         }

@@ -1,1 +1,15 @@
-<p>HomePage works!</p>
+<header>
+
+</header>
+
+<main>
+  <div class="container mx-auto px-4 sm:px-0">
+    <ul>
+      @for (article of articles(); track article.id) {
+        <li>
+          <a [routerLink]="['articles', article.slug]">{{article.title}}</a>
+        </li>
+      }
+    </ul>
+  </div>
+</main>

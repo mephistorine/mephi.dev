@@ -1,0 +1,9 @@
+{
+  "name": "shared-util-pocketbase",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/util-pocketbase/src",
+  "prefix": "util",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}
