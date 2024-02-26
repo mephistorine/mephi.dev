@@ -5,7 +5,7 @@ import {provideRouter, withComponentInputBinding} from "@angular/router"
 import {authInterceptor} from "@mephi-blog/article/domain"
 import {AuthService} from "@mephi-blog/auth"
 import {pocketbaseApiInterceptor} from "@mephi-blog/shared/util-common"
-import {providePocketbaseClient, providePocketbaseClientOptions} from "@mephi-blog/shared/util-pocketbase"
+import {providePocketbaseClientOptions} from "@mephi-blog/shared/util-pocketbase"
 import {injectCookieString} from "@mephi-blog/shared/util-ssr"
 import {provideMicroSentry} from "@micro-sentry/angular"
 import {BreadcrumbsPlugin} from "@micro-sentry/breadcrumbs-plugin"
@@ -34,7 +34,6 @@ export const appConfig: ApplicationConfig = {
       withHttpTransferCacheOptions({})
     ),
     provideRouter(appRoutes, withComponentInputBinding()),
-    providePocketbaseClient(),
     providePocketbaseClientOptions({
       baseUrl: "http://localhost:8090"
     }),

@@ -1,7 +1,10 @@
-import {ChangeDetectionStrategy, Component, inject, signal} from "@angular/core"
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, signal} from "@angular/core"
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop"
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from "@angular/forms"
+import {CreateArticleResource} from "@mephi-blog/article/domain"
+import {AuthService} from "@mephi-blog/auth"
 import {UiEditorComponent} from "@mephi-blog/shared/ui-editor"
-import {injectPocketbaseClient, PocketbaseClient} from "@mephi-blog/shared/util-pocketbase"
+import {finalize, take} from "rxjs"
 import slug from "slug"
 
 const TEST_MARKDOWN = `Marked - Markdown Parser
@@ -51,11 +54,13 @@ Ready to start writing?  Either start changing stuff on the left or
   styleUrl: "./new-article-page.component.css",
   imports: [UiEditorComponent, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {ngSkipHydration: 'true'}
+  host: {ngSkipHydration: "true"}
 })
 export class NewArticlePageComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder)
-  private readonly pocketbaseClient: PocketbaseClient = injectPocketbaseClient()
+  private readonly createArticleResource: CreateArticleResource = inject(CreateArticleResource)
+  private readonly destroyRef: DestroyRef = inject(DestroyRef)
+  private readonly authService: AuthService = inject(AuthService)
 
   protected readonly isLoading = signal(false)
 
@@ -66,16 +71,21 @@ export class NewArticlePageComponent {
 
   protected onSubmitForm(): void {
     const {title, content} = this.form.value as {title: string; content: string}
-    const user = this.pocketbaseClient.authStore.model as any
+    const user = this.authService.getUser().unwrap()
 
     this.isLoading.set(true)
-    this.pocketbaseClient.collection("articles")
-      .create({
+    this.createArticleResource
+      .execute({
         title,
         content,
         slug: slug(title),
         userId: user.id
       })
-      .finally(() => this.isLoading.set(false))
+      .pipe(
+        take(1),
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe()
   }
 }
