@@ -55,7 +55,8 @@
     },
     "@nx/angular:component": {
       "style": "css",
-      "changeDetection": "OnPush"
+      "changeDetection": "OnPush",
+      "displayBlock": true
     },
     "@nx/angular:library": {
       "linter": "eslint",

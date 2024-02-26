@@ -15,10 +15,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@mephi-blog/article/domain": ["libs/article/domain/src/index.ts"],
+      "@mephi-blog/auth": ["libs/auth/src/index.ts"],
       "@mephi-blog/shared/ui-editor": ["libs/shared/ui-editor/src/index.ts"],
+      "@mephi-blog/shared/util-common": ["libs/shared/util-common/src/index.ts"],
       "@mephi-blog/shared/util-pocketbase": ["libs/shared/util-pocketbase/src/index.ts"],
       "@mephi-blog/shared/util-signal": ["libs/shared/util-signal/src/index.ts"],
-      "@mephi-blog/shared/util-ssr": ["libs/shared/util-ssr/src/index.ts"]
+      "@mephi-blog/shared/util-ssr": ["libs/shared/util-ssr/src/index.ts"],
+      "@mephi-blog/user/domain": ["libs/user/domain/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

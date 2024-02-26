@@ -1,13 +1,27 @@
-import {ActivatedRouteSnapshot, CanActivateFn, Route} from "@angular/router"
-import {injectPocketbaseClient} from "@mephi-blog/shared/util-pocketbase"
+import {ErrorHandler, inject} from "@angular/core"
+import {ActivatedRouteSnapshot, CanActivateFn, Route, Router} from "@angular/router"
+import {GetAllArticlesResource, GetArticleBySlugResource} from "@mephi-blog/article/domain"
+import {AuthService} from "@mephi-blog/auth"
+import {fromNullable} from "@sweet-monads/maybe"
+import {catchError, of} from "rxjs"
 import {HomePageComponent} from "./pages/home-page/home-page.component"
 import {LoginPageComponent} from "./pages/login-page/login-page.component"
 import {NewArticlePageComponent} from "./pages/new-article-page/new-article-page.component"
-import {SingleArticleComponent} from "./pages/single-article/single-article.component"
+import {NotFoundErrorPageComponent} from "./pages/not-found-error-page/not-found-error-page.component"
+import {SingleArticlePageComponent} from "./pages/single-article-page/single-article-page.component"
 
 const canCreateArticle: CanActivateFn = () => {
-  const pocketbaseClient = injectPocketbaseClient()
-  return pocketbaseClient.authStore.isValid
+  const authService = inject(AuthService)
+  const router = inject(Router)
+
+  if (authService.isValid
+    && authService.getUser()
+      .map(u => u.scopes.includes("CAN_CREATE_ARTICLE"))
+      .unwrap()) {
+    return true
+  }
+
+  return router.parseUrl("/")
 }
 
 export const appRoutes: Route[] = [
@@ -18,10 +32,13 @@ export const appRoutes: Route[] = [
     title: "Главная",
     resolve: {
       articles: () => {
-        const pocketbaseClient = injectPocketbaseClient()
-        return pocketbaseClient.collection("articles").getFullList({
-          fields: "id,slug,title,content"
-        })
+        const errorHandler = inject(ErrorHandler)
+        return inject(GetAllArticlesResource).execute().pipe(
+          catchError((error) => {
+            errorHandler.handleError(error)
+            return of([])
+          })
+        )
       }
     }
   },
@@ -34,20 +51,28 @@ export const appRoutes: Route[] = [
   {
     path: "login",
     component: LoginPageComponent,
-    title: "Авторизация",
+    title: "Авторизация"
   },
   {
     path: "articles/:slug",
-    component: SingleArticleComponent,
+    component: SingleArticlePageComponent,
+    title: "Статья",
     resolve: {
-      article: async (route: ActivatedRouteSnapshot) => {
-        const pocketbaseClient = injectPocketbaseClient()
-        const slug = route.paramMap.get("slug")
-        return await pocketbaseClient.collection("articles").getFirstListItem(`slug = '${slug}'`, {
-          fields: "id,slug,title,content"
-        })
+      article: (route: ActivatedRouteSnapshot) => {
+        const errorHandler = inject(ErrorHandler)
+        const slug = fromNullable(route.paramMap.get("slug"))
+        return inject(GetArticleBySlugResource).execute(slug.unwrap()).pipe(
+          catchError((error) => {
+            errorHandler.handleError(error)
+            return of(null)
+          })
+        )
       }
-    },
-    title: "Статья"
+    }
+  },
+  {
+    path: "**",
+    component: NotFoundErrorPageComponent,
+    title: "Такой страницы нет"
   }
 ]

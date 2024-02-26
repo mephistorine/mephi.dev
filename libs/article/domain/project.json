@@ -1,0 +1,9 @@
+{
+  "name": "article-domain",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/article/domain/src",
+  "prefix": "mephi-blog",
+  "tags": [],
+  "projectType": "library",
+  "targets": {}
+}

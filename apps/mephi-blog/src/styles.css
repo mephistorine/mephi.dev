@@ -5,3 +5,7 @@
 body {
   @apply m-0 bg-zinc-50 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-200;
 }
+
+.text-container {
+  @apply max-w-[70ch]
+}

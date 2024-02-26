@@ -18,13 +18,13 @@
 </header>
 
 <main>
-  <div class="text-container mx-auto px-4 sm:px-0">
-    <ul>
-      @for (article of articles(); track article.id) {
-        <li>
-          <a class="text-2xl font-bold underline hover:no-underline" [routerLink]="['articles', article.slug]">{{article.title}}</a>
-        </li>
-      }
-    </ul>
+  <div class="container mx-auto px-4 sm:px-0">
+    @if(isEmptyArticle()) {
+      <p>Статья не загрузилась</p>
+    } @else {
+      <h1 class="text-4xl font-bold">{{title()}}</h1>
+
+      <div class="prose dark:prose-invert" [innerHTML]="content()"></div>
+    }
   </div>
 </main>

@@ -11,7 +11,9 @@
     "start": "nx serve mephi-blog --port 4546",
     "build": "nx build mephi-blog",
     "build:watch": "nx build mephi-blog --configuration development --watch",
-    "start:ssr": "node --watch dist/apps/mephi-blog/server/server.mjs"
+    "start:ssr": "node --watch dist/apps/mephi-blog/server/server.mjs",
+    "lint": "nx affected -t lint",
+    "test": "nx affected -t test"
   },
   "private": true,
   "dependencies": {
@@ -28,9 +30,13 @@
     "@angular/ssr": "~17.1.0",
     "@fastify/cookie": "9.3.1",
     "@fastify/static": "7.0.1",
+    "@micro-sentry/angular": "7.0.2",
+    "@micro-sentry/breadcrumbs-plugin": "1.0.0",
     "@ng-web-apis/common": "3.0.6",
     "@ng-web-apis/universal": "3.0.7",
     "@nx/angular": "18.0.0",
+    "@sweet-monads/either": "3.3.1",
+    "@sweet-monads/maybe": "3.3.1",
     "@tailwindcss/typography": "0.5.10",
     "@tinkoff/ng-dompurify": "4.0.0",
     "@tinkoff/ng-event-plugins": "3.1.0",

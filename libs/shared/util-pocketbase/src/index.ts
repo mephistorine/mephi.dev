@@ -40,6 +40,9 @@ export function providePocketbaseClient(): EnvironmentProviders {
   ])
 }
 
+/**
+ * @deprecated
+ */
 export function injectPocketbaseClient(): PocketbaseClient {
   return inject(POCKETBASE_CLIENT)
 }

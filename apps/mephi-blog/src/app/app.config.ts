@@ -1,28 +1,29 @@
-import {APP_INITIALIZER, ApplicationConfig} from "@angular/core"
+import {provideHttpClient, withFetch, withInterceptors} from "@angular/common/http"
+import {APP_INITIALIZER, ApplicationConfig, inject} from "@angular/core"
 import {provideClientHydration, withHttpTransferCacheOptions} from "@angular/platform-browser"
 import {provideRouter, withComponentInputBinding} from "@angular/router"
-import {
-  injectPocketbaseClient,
-  POCKETBASE_COOKIE_KEY,
-  providePocketbaseClient
-} from "@mephi-blog/shared/util-pocketbase"
+import {authInterceptor} from "@mephi-blog/article/domain"
+import {AuthService} from "@mephi-blog/auth"
+import {pocketbaseApiInterceptor} from "@mephi-blog/shared/util-common"
+import {providePocketbaseClient, providePocketbaseClientOptions} from "@mephi-blog/shared/util-pocketbase"
 import {injectCookieString} from "@mephi-blog/shared/util-ssr"
+import {provideMicroSentry} from "@micro-sentry/angular"
+import {BreadcrumbsPlugin} from "@micro-sentry/breadcrumbs-plugin"
 import {NG_EVENT_PLUGINS} from "@tinkoff/ng-event-plugins"
 import {appRoutes} from "./app.routes"
 
 function pocketbaseClientAuthFactory() {
-  const pocketbaseClient = injectPocketbaseClient()
   const cookieString = injectCookieString()
+  const authService = inject(AuthService)
 
   return async () => {
-    pocketbaseClient.authStore.loadFromCookie(cookieString, POCKETBASE_COOKIE_KEY)
-
+    authService.loadFromCookie(cookieString)
     try {
-      if (pocketbaseClient.authStore.isValid) {
-        await pocketbaseClient.collection("users").authRefresh()
+      if (authService.isValid) {
+        await authService.authRefresh()
       }
-    } catch (e) {
-      pocketbaseClient.authStore.clear()
+    } catch (_) {
+      authService.clear()
     }
   }
 }
@@ -30,17 +31,30 @@ function pocketbaseClientAuthFactory() {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideClientHydration(
-      withHttpTransferCacheOptions({
-        includePostRequests: true,
-      })
+      withHttpTransferCacheOptions({})
     ),
     provideRouter(appRoutes, withComponentInputBinding()),
     providePocketbaseClient(),
+    providePocketbaseClientOptions({
+      baseUrl: "http://localhost:8090"
+    }),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([
+        pocketbaseApiInterceptor,
+        authInterceptor
+      ])
+    ),
     NG_EVENT_PLUGINS,
     {
       provide: APP_INITIALIZER,
       useFactory: pocketbaseClientAuthFactory,
       multi: true
-    }
-  ],
+    },
+    // TODO: Setup sentry
+    provideMicroSentry({
+      dsn: "",
+      plugins: [BreadcrumbsPlugin]
+    })
+  ]
 }
