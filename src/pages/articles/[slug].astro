@@ -1,0 +1,129 @@
+---
+import {Image} from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import {getCollection, render} from "astro:content";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+function calculateTimeToRead(article: CollectionEntry<'articles'>): number {
+    const numWords = (article.body || "")
+        .replace(/.*\[(.*?)\].*/gm, "$1")
+        .replace(/```.*?```/gms, "")
+        .split(/\s+/).length;
+
+    const numImages = article.body?.match(/!\[/g)?.length ?? 0;
+    const numCodeblocks = article.body?.match(/```/g)?.length ?? 0;
+
+    return Math.ceil(numWords / 150) + Math.ceil(numImages / 6) + Math.ceil(numCodeblocks / 3);
+}
+
+export async function getStaticPaths() {
+    const articles = await getCollection("articles");
+    return articles.map((article) => {
+        return {
+            params: {slug: article.id},
+            props: {article}
+        }
+    })
+}
+
+const {article} = Astro.props;
+let {Content, headings} = await render(article);
+const {title, publishDate, description, poster} = article.data
+const timeToRead = calculateTimeToRead(article)
+---
+
+<BaseLayout>
+    <Header />
+    <main class="container">
+        <article class="article">
+            <header class="article__header">
+                <div>
+                    Опубликовано
+                    <time class="article__publish-date" datetime={publishDate.toISOString()}>{publishDate.toLocaleDateString("ru", {dateStyle: "medium"})}</time>
+                    Читать <time datetime={`${timeToRead}m`} class="article__time-to-read">{timeToRead}</time> мин.
+                </div>
+                <h1 class="article__title">{title}</h1>
+                {description && <p class="article__description">{description}</p>}
+                {poster && <figure>
+                    <Image
+                        src={poster.url}
+                        alt={poster.alt}
+                        layout="full-width"
+                    />
+                </figure>}
+            </header>
+            <aside class="article__sidebar">
+                <section class="table-of-content">
+                    <h3>Содержание</h3>
+                    <ul class="table-of-content__list">
+                        {headings.map((heading) => {
+                            return <li class="table-of-content__list-item" style={{"--depth": heading.depth - 2}}><a href={`#${heading.slug}`}>{heading.text}</a></li>
+                        })}
+                    </ul>
+                </section>
+                <section>
+                    <h3>Свежие статьи</h3>
+                </section>
+            </aside>
+            <div class="article__content">
+                <Content />
+            </div>
+            <footer class="article__footer">
+                <section>
+                    <h3>Похожие статьи</h3>
+                </section>
+            </footer>
+        </article>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .article {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: min-content 1fr min-content;
+    }
+
+    .article__header {
+        grid-column: 1/-1;
+        grid-row: 1/2;
+    }
+
+    .article__sidebar {
+        grid-column: 1/5;
+    }
+
+    .article__content {
+        grid-column: 5/-1;
+    }
+
+    .article__title {
+        font-size: 4rem;
+        margin: 0;
+        margin-block-end: 1rem;
+    }
+
+    .article__description {
+        font-size: 1.3rem;
+        margin: 0;
+        margin-block-end: 1rem;
+    }
+
+    .article__footer {
+        grid-column: 1/-1;
+        grid-row: 3/-1;
+    }
+
+    .table-of-content__list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .table-of-content__list-item {
+        padding-inline-start: calc(var(--depth) * 0.5rem);
+    }
+</style>

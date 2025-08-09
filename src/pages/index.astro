@@ -1,16 +1,175 @@
 ---
+import {getCollection} from "astro:content";
+import {isToday, isYesterday} from "date-fns";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
+const articles = await getCollection("articles");
+const categories = [
+    {
+        id: "1",
+        data: {
+            title: "Hello"
+        }
+    }
+]
+
+const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
+    return a.data.publishDate.getTime() - b.data.publishDate.getTime()
+})
+
+const formatHumanDate = (date: Date): string => {
+    if (isToday(date)) {
+        return "Сегодня";
+    }
+
+    if (isYesterday(date)) {
+        return "Вчера";
+    }
+
+    return date.toLocaleDateString("ru", {dateStyle: "medium"});
+};
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+    <Header/>
+
+    <main class="container">
+        <section class="latest-article-section">
+            <article class="latest-article">
+                <time
+                    class="latest-article__publish-time"
+                    datetime={firstArticle.data.publishDate.toISOString()}
+                >{formatHumanDate(firstArticle.data.publishDate)}</time>
+                <h3 class="latest-article__title">
+                    <a href={`/articles/${firstArticle.id}`}>{firstArticle.data.title}</a>
+                </h3>
+                <p class="latest-article__excerpt">{firstArticle.data.description}</p>
+                <!--<span class="latest-article__reading-time">читать 10 мин.</span>-->
+            </article>
+        </section>
+
+        <div class="content">
+            <section class="section">
+                <h2 class="section__title">Статьи</h2>
+                {
+                    otherArticles.map((entry) => {
+                        return <article class="article">
+                            <h3 class="article__title"><a href={`/articles/${entry.id}`}>{entry.data.title}</a></h3>
+                            {entry.data.description && <p class="article__description">{entry.data.description}</p>}
+                            <time
+                                class="article__publish-date"
+                                datetime={firstArticle.data.publishDate.toISOString()}
+                            >{formatHumanDate(firstArticle.data.publishDate)}</time>
+                        </article>
+                    })
+                }
+            </section>
+
+            <aside class="sidebar">
+                <section class="section">
+                    <h2 class="section__title">Категории</h2>
+                    <ul class="categories">
+                        {categories.map((category) => {
+                            return <li><a href={`/categories/${category.id}`}>{category.data.title}</a></li>
+                        })}
+                    </ul>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <Footer />
+</BaseLayout>
+
+<style>
+    .latest-article-section {
+        margin-block: 7rem;
+    }
+
+    .latest-article__title {
+        font-size: 4rem;
+        margin: 0;
+        margin-block-end: 2rem;
+    }
+
+    .latest-article__excerpt {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .latest-article__publish-time {
+        margin-block-end: 1rem;
+        display: block;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        font-family: "IBM Plex Sans", sans-serif;
+    }
+
+    .latest-article__reading-time {
+        opacity: 0.6;
+    }
+
+    .section__title {
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        margin: 0;
+        margin-block-end: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5%;
+    }
+
+    .section__title::after {
+        content: "";
+        display: block;
+        flex-grow: 1;
+        background-color: black;
+        height: 1px;
+        opacity: 0.3;
+    }
+
+    .article:not(:last-child) {
+        margin-block-end: 3rem;
+    }
+
+    .article__title {
+        font-size: 2.1rem;
+        margin: 0;
+    }
+
+    .article__description {
+        font-size: 1.1rem;
+    }
+
+    .article__publish-date {
+        font-family: "IBM Plex Sans", sans-serif;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        color: var(--primary-color);
+    }
+
+    .content {
+        display: grid;
+        gap: 4rem;
+        grid-template-columns: 9fr 3fr;
+    }
+
+    .categories {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+</style>

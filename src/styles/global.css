@@ -1,0 +1,67 @@
+:root {
+    /* From https://t.me/alexnozer_dev/56 */
+    --sb: calc(100vw - 100%);
+    --vw: calc(100vw - var(--sb));
+    color-scheme: light dark;
+    --primary-color: #8870FF;
+
+    --text-color: light-dark(black, white);
+    --bg-color: light-dark(white, black);
+}
+
+.container {
+    /* from https://t.me/alexnozer_dev/203 */
+    --container-max-width: 120ch;
+    --container-min-field: 16px;
+    --container-field: calc(
+        (var(--vw) - var(--container-max-width)) / 2
+    );
+
+    width: 100%;
+    padding-inline: 1rem;
+}
+
+@media screen and (width >= 40rem) {
+    .container {
+        padding-inline: max(
+            var(--container-field),
+            var(--container-min-field)
+        );
+    }
+}
+
+h1, h2,
+h3, h4 {
+    font-family: "IBM Plex Sans", sans-serif;
+}
+
+body {
+    font-family: "IBM Plex Serif", serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+
+code, pre {
+    font-family: "IBM Plex Mono", monospace;
+}
+
+a {
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .astro-code,
+    .astro-code span {
+        color: var(--shiki-dark) !important;
+        background-color: var(--shiki-dark-bg) !important;
+        /* Optional, if you also want font styles */
+        font-style: var(--shiki-dark-font-style) !important;
+        font-weight: var(--shiki-dark-font-weight) !important;
+        text-decoration: var(--shiki-dark-text-decoration) !important;
+    }
+}
