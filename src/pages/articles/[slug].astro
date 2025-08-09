@@ -46,12 +46,18 @@ const timeToRead = calculateTimeToRead(article)
                 </div>
                 <h1 class="article__title">{title}</h1>
                 {description && <p class="article__description">{description}</p>}
-                {poster && <figure>
+                {poster && <figure class="article__poster">
                     <Image
                         src={poster.url}
                         alt={poster.alt}
-                        layout="full-width"
+                        layout="constrained"
+                        class="article__poster-image"
                     />
+
+                    {poster.author && <figcaption class="article__poster-caption">
+                        Автор фото
+                        <a href={poster.author.url}>{poster.author.name}</a>
+                    </figcaption>}
                 </figure>}
             </header>
             <aside class="article__sidebar">
@@ -115,6 +121,18 @@ const timeToRead = calculateTimeToRead(article)
     .article__footer {
         grid-column: 1/-1;
         grid-row: 3/-1;
+    }
+
+    .article__poster {
+        margin: 0;
+    }
+
+    .article__poster-image {
+        aspect-ratio: 16/9;
+    }
+
+    .article__poster-caption {
+        font-size: 0.8rem;
     }
 
     .table-of-content__list {
