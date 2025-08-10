@@ -1,5 +1,6 @@
 ---
 import {getCollection} from "astro:content";
+import Article from "../../components/Article.astro";
 import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -14,12 +15,24 @@ export async function getStaticPaths() {
 }
 const {category} = Astro.props;
 const title = `Категория: ${category.data.name}`
+const articlesByCategory = await getCollection("articles", ({data}) => data.category.id === category.data.slug)
 ---
 
 <BaseLayout title={title}>
     <Header />
     <main class="container">
-        <h1>{title}</h1>
+        <h1 class="title">{title}</h1>
+
+        {articlesByCategory.map((article) => {
+            return <Article id={article.id} article={article.data} />
+        })}
     </main>
     <Footer />
 </BaseLayout>
+
+<style>
+    .title {
+        font-size: 2.5rem;
+        margin-block-end: 3rem;
+    }
+</style>

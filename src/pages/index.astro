@@ -1,9 +1,11 @@
 ---
 import {getCollection, getEntry} from "astro:content";
 import {isToday, isYesterday} from "date-fns";
+import Article from "../components/Article.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import {pathBuilder} from "../utils";
 
 const articles = await getCollection("articles");
 const categories = await getCollection("categories");
@@ -12,22 +14,6 @@ const tags = await getCollection("tags");
 const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
     return b.data.publishDate.getTime() - a.data.publishDate.getTime()
 })
-
-const firstArticleCategory = await getEntry(firstArticle.data.category);
-
-const hasFirstArticleCategory = firstArticleCategory.data.slug !== "empty";
-
-const formatHumanDate = (date: Date): string => {
-    if (isToday(date)) {
-        return "Сегодня";
-    }
-
-    if (isYesterday(date)) {
-        return "Вчера";
-    }
-
-    return date.toLocaleDateString("ru", {dateStyle: "medium"});
-};
 ---
 
 <BaseLayout title="Главная">
@@ -35,51 +21,17 @@ const formatHumanDate = (date: Date): string => {
 
     <main class="container">
         <section class="latest-article-section">
-            <article class="latest-article">
-                <div class="latest-article__publish-time-and-category">
-                    {firstArticleCategory && <span class="latest-article__category">
-                        <a href={`/categories/${firstArticleCategory.data.slug}`}>{firstArticleCategory.data.name}</a>
-                    </span>}
-                    <time
-                        class="latest-article__publish-time"
-                        datetime={firstArticle.data.publishDate.toISOString()}
-                    >{formatHumanDate(firstArticle.data.publishDate)}</time>
-                </div>
-                <h3 class="latest-article__title">
-                    <a href={`/articles/${firstArticle.id}`}>{firstArticle.data.title}</a>
-                </h3>
-                <p class="latest-article__excerpt">{firstArticle.data.description}</p>
-                <!--<span class="latest-article__reading-time">читать 10 мин.</span>-->
-            </article>
+            <Article
+                id={firstArticle.id}
+                isHero={true}
+                article={firstArticle.data}
+            />
         </section>
 
         <div class="content">
-            <section class="section">
+            <section class="section section--articles">
                 <h2 class="section__title">Статьи</h2>
-                {
-                    otherArticles.map(
-                        async (entry) => {
-                            const category = await getEntry(entry.data.category);
-                            const hasCategory = category.data.slug !== "empty";
-
-                            return <article class="article">
-                                <h3 class="article__title">
-                                    <a href={`/articles/${entry.id}`}>{entry.data.title}</a>
-                                </h3>
-                                {entry.data.description && <p class="article__description">{entry.data.description}</p>}
-                                <div>
-                                    {hasCategory &&
-                                        <span>
-                                            <a href={`/categories/${category.data.slug}`}>{category.data.name}</a>
-                                        </span>}
-                                    <time
-                                        class="article__publish-date"
-                                        datetime={entry.data.publishDate.toISOString()}
-                                    >{formatHumanDate(entry.data.publishDate)}</time>
-                                </div>
-                            </article>
-                        })
-                }
+                {otherArticles.map((article) => <Article id={article.id} article={article.data} />)}
             </section>
 
             <aside class="sidebar">
@@ -87,7 +39,7 @@ const formatHumanDate = (date: Date): string => {
                     <h2 class="section__title">Категории</h2>
                     <ul class="categories">
                         {categories.map((category) => {
-                            return <li><a href={`/categories/${category.data.slug}`}>{category.data.name}</a></li>
+                            return <li><a href={pathBuilder.singleTag(category.data.slug)}>{category.data.name}</a></li>
                         })}
                     </ul>
                 </section>
@@ -95,7 +47,7 @@ const formatHumanDate = (date: Date): string => {
                     <h2 class="section__title">Метки</h2>
                     <ul class="categories">
                         {tags.map((tag) => {
-                            return <li><a href={`/tags/${tag.data.slug}`}>{tag.data.name}</a></li>
+                            return <li><a href={pathBuilder.singleTag(tag.data.slug)}>{tag.data.name}</a></li>
                         })}
                     </ul>
                 </section>
@@ -111,40 +63,14 @@ const formatHumanDate = (date: Date): string => {
         margin-block: 7rem;
     }
 
-    .latest-article__title {
-        font-size: 4rem;
-        margin: 0;
-        margin-block-end: 2rem;
-    }
-
-    .latest-article__excerpt {
-        margin: 0;
-        font-size: 1.4rem;
-    }
-
-    .latest-article__publish-time-and-category {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    .latest-article__publish-time {
-        display: block;
-        color: var(--primary-color);
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        font-weight: 500;
-        letter-spacing: 0.05em;
-        font-family: "IBM Plex Sans", sans-serif;
-    }
-
-    .latest-article__reading-time {
-        opacity: 0.6;
-    }
-
     .section {
         margin-block-end: 2rem;
+    }
+
+    .section--articles {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
     }
 
     .section__title {
@@ -167,28 +93,6 @@ const formatHumanDate = (date: Date): string => {
         background-color: black;
         height: 1px;
         opacity: 0.3;
-    }
-
-    .article:not(:last-child) {
-        margin-block-end: 3rem;
-    }
-
-    .article__title {
-        font-size: 2.1rem;
-        margin: 0;
-    }
-
-    .article__description {
-        font-size: 1.1rem;
-    }
-
-    .article__publish-date {
-        font-family: "IBM Plex Sans", sans-serif;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        font-weight: 500;
-        letter-spacing: 0.05em;
-        color: var(--primary-color);
     }
 
     .content {

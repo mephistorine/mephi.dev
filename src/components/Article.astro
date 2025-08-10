@@ -1,0 +1,74 @@
+---
+import {getEntry, type InferEntrySchema} from "astro:content";
+import {formatHumanDate, pathBuilder} from "../utils";
+
+type Props = {
+    readonly id: string
+    readonly isHero?: boolean
+    readonly article: InferEntrySchema<"articles">
+}
+
+const {
+    id: articleId,
+    isHero = false,
+    article
+} = Astro.props
+
+const {title, description, category, publishDate} = article;
+const categoryEntry = await getEntry(category);
+const hasCategory = categoryEntry.id !== "empty";
+---
+
+<article class="article" class:list={{"article--hero": isHero}}>
+    <h3 class="article__title">
+        <a href={pathBuilder.singleArticle(articleId)}>{title}</a>
+    </h3>
+    {description && <p class="article__description">{description}</p>}
+    <div class="article__info">
+        {hasCategory &&
+            <a href={pathBuilder.singleCategory(categoryEntry.data.slug)}>{categoryEntry.data.name}</a>}
+        <time
+            class="article__publish-date"
+            datetime={publishDate.toISOString()}
+        >{formatHumanDate(publishDate)}</time>
+    </div>
+</article>
+
+<style>
+    .article {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article__title {
+        font-size: 2.1rem;
+        margin-block-end: 1.5rem;
+    }
+
+    .article__description {
+        font-size: 1.1rem;
+        margin-block-end: 1rem;
+    }
+
+    .article__publish-date {
+        font-family: "IBM Plex Sans", sans-serif;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        color: var(--primary-color);
+    }
+
+    .article--hero .article__info {
+        order: -1;
+    }
+
+    .article--hero .article__title {
+        font-size: 4rem;
+        margin-block-end: 2rem;
+    }
+
+    .article--hero .article__description {
+        font-size: 1.4rem;
+    }
+</style>
