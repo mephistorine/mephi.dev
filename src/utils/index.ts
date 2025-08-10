@@ -19,4 +19,6 @@ export const pathBuilder = {
     singleArticle: (slug: string) => `/articles/${slug}`,
     singleCategory: (slug: string) => `/categories/${slug}`,
     singleTag: (slug: string) => `/tags/${slug}`,
+    rss: () => "/rss.xml",
+    search: (query?: string) => `/search${query ? `?q=${encodeURIComponent(query)}` : ""}`
 }

@@ -1,6 +1,15 @@
+---
+import Logo from "../../public/logo.svg";
+import LuRssIcon from "../../public/lucide_rss.svg";
+import LuSearchIcon from "../../public/lucide_search.svg";
+import {pathBuilder} from "../utils";
+---
+
 <header class="container">
     <div>
-        <a href="/"><img src="/logo.svg" class="logo"></a>
+        <a href="/">
+            <Logo class="logo" />
+        </a>
     </div>
 
     <nav>
@@ -10,12 +19,13 @@
     </nav>
 
     <div>
-        <a href="/rss" target="_blank">
-            <img src="https://api.iconify.design/lucide:rss.svg">
+        <a class="rss-link" href={pathBuilder.rss()} target="_blank">
+            <LuRssIcon />
         </a>
-        <button type="button">
-            <img src="https://api.iconify.design/lucide:search.svg">
-        </button>
+
+        <a class="open-search-button" href={pathBuilder.search()}>
+            <LuSearchIcon />
+        </a>
     </div>
 </header>
 
@@ -37,5 +47,21 @@
     .logo {
         width: 2rem;
         height: 2rem;
+    }
+
+    .rss-link {
+        text-decoration: none;
+    }
+
+    .open-search-button {
+        padding: 0;
+        margin: 0;
+        border: none;
+        background: none;
+    }
+
+    .rss-link,
+    .open-search-button {
+        font-size: 1.2rem;
     }
 </style>

@@ -1,0 +1,14 @@
+---
+import PageFindSearch from "astro-pagefind/components/Search"
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Поиск">
+    <Header />
+    <main class="container">
+        <PageFindSearch />
+    </main>
+    <Footer />
+</BaseLayout>

@@ -9,8 +9,11 @@
         "astro": "astro"
     },
     "dependencies": {
+        "@astrojs/rss": "4.0.12",
         "astro": "^5.12.8",
-        "date-fns": "4.1.0"
+        "astro-pagefind": "1.8.3",
+        "date-fns": "4.1.0",
+        "sanitize-html": "2.17.0"
     },
     "engines": {
         "node": ">=24"
