@@ -1,0 +1,8 @@
+- name: Фронтенд
+  slug: frontend
+- name: Бекенд
+  slug: backend
+- name: Архитектура
+  slug: arch
+- name: Без категории
+  slug: empty

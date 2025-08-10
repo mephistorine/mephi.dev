@@ -1,23 +1,21 @@
 ---
-import {getCollection} from "astro:content";
+import {getCollection, getEntry} from "astro:content";
 import {isToday, isYesterday} from "date-fns";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const articles = await getCollection("articles");
-const categories = [
-    {
-        id: "1",
-        data: {
-            title: "Hello"
-        }
-    }
-]
+const categories = await getCollection("categories");
+const tags = await getCollection("tags");
 
 const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
-    return a.data.publishDate.getTime() - b.data.publishDate.getTime()
+    return b.data.publishDate.getTime() - a.data.publishDate.getTime()
 })
+
+const firstArticleCategory = await getEntry(firstArticle.data.category);
+
+const hasFirstArticleCategory = firstArticleCategory.data.slug !== "empty";
 
 const formatHumanDate = (date: Date): string => {
     if (isToday(date)) {
@@ -32,16 +30,21 @@ const formatHumanDate = (date: Date): string => {
 };
 ---
 
-<BaseLayout>
+<BaseLayout title="Главная">
     <Header/>
 
     <main class="container">
         <section class="latest-article-section">
             <article class="latest-article">
-                <time
-                    class="latest-article__publish-time"
-                    datetime={firstArticle.data.publishDate.toISOString()}
-                >{formatHumanDate(firstArticle.data.publishDate)}</time>
+                <div class="latest-article__publish-time-and-category">
+                    {firstArticleCategory && <span class="latest-article__category">
+                        <a href={`/categories/${firstArticleCategory.data.slug}`}>{firstArticleCategory.data.name}</a>
+                    </span>}
+                    <time
+                        class="latest-article__publish-time"
+                        datetime={firstArticle.data.publishDate.toISOString()}
+                    >{formatHumanDate(firstArticle.data.publishDate)}</time>
+                </div>
                 <h3 class="latest-article__title">
                     <a href={`/articles/${firstArticle.id}`}>{firstArticle.data.title}</a>
                 </h3>
@@ -54,16 +57,28 @@ const formatHumanDate = (date: Date): string => {
             <section class="section">
                 <h2 class="section__title">Статьи</h2>
                 {
-                    otherArticles.map((entry) => {
-                        return <article class="article">
-                            <h3 class="article__title"><a href={`/articles/${entry.id}`}>{entry.data.title}</a></h3>
-                            {entry.data.description && <p class="article__description">{entry.data.description}</p>}
-                            <time
-                                class="article__publish-date"
-                                datetime={firstArticle.data.publishDate.toISOString()}
-                            >{formatHumanDate(firstArticle.data.publishDate)}</time>
-                        </article>
-                    })
+                    otherArticles.map(
+                        async (entry) => {
+                            const category = await getEntry(entry.data.category);
+                            const hasCategory = category.data.slug !== "empty";
+
+                            return <article class="article">
+                                <h3 class="article__title">
+                                    <a href={`/articles/${entry.id}`}>{entry.data.title}</a>
+                                </h3>
+                                {entry.data.description && <p class="article__description">{entry.data.description}</p>}
+                                <div>
+                                    {hasCategory &&
+                                        <span>
+                                            <a href={`/categories/${category.data.slug}`}>{category.data.name}</a>
+                                        </span>}
+                                    <time
+                                        class="article__publish-date"
+                                        datetime={entry.data.publishDate.toISOString()}
+                                    >{formatHumanDate(entry.data.publishDate)}</time>
+                                </div>
+                            </article>
+                        })
                 }
             </section>
 
@@ -72,7 +87,15 @@ const formatHumanDate = (date: Date): string => {
                     <h2 class="section__title">Категории</h2>
                     <ul class="categories">
                         {categories.map((category) => {
-                            return <li><a href={`/categories/${category.id}`}>{category.data.title}</a></li>
+                            return <li><a href={`/categories/${category.data.slug}`}>{category.data.name}</a></li>
+                        })}
+                    </ul>
+                </section>
+                <section class="section">
+                    <h2 class="section__title">Метки</h2>
+                    <ul class="categories">
+                        {tags.map((tag) => {
+                            return <li><a href={`/tags/${tag.data.slug}`}>{tag.data.name}</a></li>
                         })}
                     </ul>
                 </section>
@@ -99,8 +122,14 @@ const formatHumanDate = (date: Date): string => {
         font-size: 1.4rem;
     }
 
+    .latest-article__publish-time-and-category {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
     .latest-article__publish-time {
-        margin-block-end: 1rem;
         display: block;
         color: var(--primary-color);
         text-transform: uppercase;
@@ -114,6 +143,10 @@ const formatHumanDate = (date: Date): string => {
         opacity: 0.6;
     }
 
+    .section {
+        margin-block-end: 2rem;
+    }
+
     .section__title {
         font-size: 0.8rem;
         font-weight: 500;
@@ -121,7 +154,7 @@ const formatHumanDate = (date: Date): string => {
         text-transform: uppercase;
         opacity: 0.5;
         margin: 0;
-        margin-block-end: 1.5rem;
+        margin-block-end: 1rem;
         display: flex;
         align-items: center;
         gap: 5%;

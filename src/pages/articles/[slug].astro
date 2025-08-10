@@ -34,7 +34,23 @@ const {title, publishDate, description, poster} = article.data
 const timeToRead = calculateTimeToRead(article)
 ---
 
-<BaseLayout>
+<BaseLayout title={title} description={description}>
+    <Fragment slot="head">
+        <!-- Open Graph -->
+        <meta property="og:title" content={title}>
+        <meta property="og:description" content={description}>
+        <!--<meta property="og:image" content="https://example.com/images/bread.jpg">-->
+        <!--<meta property="og:url" content="https://example.com/bread">-->
+        <meta property="og:type" content="article">
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content={title}>
+        <meta name="twitter:description" content={description}>
+        <!--<meta name="twitter:image" content="https://example.com/images/bread.jpg">-->
+        <meta name="twitter:site" content="@mephistorine">
+    </Fragment>
+
     <Header />
     <main class="container">
         <article class="article">

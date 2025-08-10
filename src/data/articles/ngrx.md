@@ -2,7 +2,7 @@
 title: Плюсы и минусы использования NgRx и сигналов
 description: Анализ преимуществ и недостатков использования NgRx и сигналов для эффективного управления состоянием в Angular-приложениях.
 publishDate: 2025-07-15
-updateDate: 2025-07-15
+category: empty
 poster:
     url: "../assets/ngrx/image-2.jpg"
     alt: Some alt

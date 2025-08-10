@@ -1,5 +1,5 @@
-import {glob} from "astro/loaders";
-import {defineCollection} from "astro:content";
+import {glob, file} from "astro/loaders";
+import {defineCollection, reference} from "astro:content";
 import {z} from "zod";
 
 export const articles = defineCollection({
@@ -11,7 +11,9 @@ export const articles = defineCollection({
         title: z.string(),
         description: z.string().optional(),
         publishDate: z.date().transform(date => new Date(date)),
-        updateDate: z.date().transform(date => new Date(date)),
+        // updateDate: z.date().transform(date => new Date(date)),
+        category: reference("categories"),
+        tags: z.array(reference("tags")).optional(),
         poster: z.object({
             url: image(),
             alt: z.string(),
@@ -22,15 +24,21 @@ export const articles = defineCollection({
         }).optional(),
     }),
 });
-/*
-export const categories = defineCollection({
-    loader: glob({
-        pattern: "**!/!*.md",
-        base: "./src/pages/categories"
-    }),
-    schema: z.object({
-        title: z.string()
-    })
-})*/
 
-export const collections = {articles};
+export const categories = defineCollection({
+    loader: file("./src/data/categories.yml"),
+    schema: z.object({
+        slug: z.string(),
+        name: z.string()
+    })
+})
+
+export const tags = defineCollection({
+    loader: file("./src/data/tags.yml"),
+    schema: z.object({
+        slug: z.string(),
+        name: z.string()
+    })
+})
+
+export const collections = {articles, categories, tags};
