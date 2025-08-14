@@ -1,0 +1,45 @@
+---
+import type {InferEntrySchema} from "astro:content";
+import {format, getDate, getDay, isSameDay, isSameMonth} from "date-fns";
+import {ru} from "date-fns/locale";
+
+type Props = {
+    readonly speech: InferEntrySchema<"speeches">
+    readonly id: string
+}
+
+const {speech, id} = Astro.props
+
+function formatSpeechDate(startDate: Date, endDate: Date): string {
+    if (isSameDay(startDate, endDate)) {
+        return startDate.toLocaleDateString("ru", {dateStyle: "medium"})
+    }
+
+    if (isSameMonth(startDate, endDate)) {
+        return `${getDate(startDate)}—${endDate.toLocaleDateString("ru", {dateStyle: "medium"})}`
+    }
+
+    return `${format(startDate, "d MMM", {locale: ru})}—${endDate.toLocaleDateString("ru", {dateStyle: "medium"})}`
+}
+---
+
+<article class="speech-card">
+    <h3><a href={`/talks/${id}`}>{speech.title}</a></h3>
+    {speech.conference.url && <p><a href={speech.conference.url}>{speech.conference.name}</a></p>}
+    {!speech.conference.url && <p>{speech.conference.name}</p>}
+    <time>{formatSpeechDate(speech.startDate, speech.endDate)}</time>
+    <address>{speech.conference.location}</address>
+</article>
+
+<style>
+    .speech-card {
+        width: 15rem;
+        border: 1px solid #373636;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        display: flex;
+        gap: 0.7rem;
+        flex-direction: column;
+        flex: none;
+    }
+</style>

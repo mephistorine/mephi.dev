@@ -1,8 +1,8 @@
 import {isToday, isYesterday} from "date-fns";
 
-export * from "./plugins.ts"
+export * from "./plugins.ts";
 
-export const formatHumanDate = (date: Date): string => {
+export function formatHumanReadableRelativeDate(date: Date): string {
     if (isToday(date)) {
         return "Сегодня";
     }
@@ -12,7 +12,7 @@ export const formatHumanDate = (date: Date): string => {
     }
 
     return date.toLocaleDateString("ru", {dateStyle: "medium"});
-};
+}
 
 export const pathBuilder = {
     home: () => "/",
@@ -20,5 +20,5 @@ export const pathBuilder = {
     singleCategory: (slug: string) => `/categories/${slug}`,
     singleTag: (slug: string) => `/tags/${slug}`,
     rss: () => "/rss.xml",
-    search: (query?: string) => `/search${query ? `?q=${encodeURIComponent(query)}` : ""}`
-}
+    search: (query?: string) => `/search${query ? `?q=${encodeURIComponent(query)}` : ""}`,
+};

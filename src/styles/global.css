@@ -4,9 +4,8 @@
     --vw: calc(100vw - var(--sb));
     color-scheme: light dark;
     --primary-color: #8870FF;
-
-    --text-color: light-dark(black, white);
-    --bg-color: light-dark(white, black);
+    --text-color: light-dark(#131313, #d9d9d9);
+    --bg-color: light-dark(#d9d9d9, #131313);
 }
 
 .container {

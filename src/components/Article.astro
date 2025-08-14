@@ -1,17 +1,19 @@
 ---
 import {getEntry, type InferEntrySchema} from "astro:content";
-import {formatHumanDate, pathBuilder} from "../utils";
+import {formatHumanReadableRelativeDate, pathBuilder} from "../utils";
 
 type Props = {
     readonly id: string
     readonly isHero?: boolean
     readonly article: InferEntrySchema<"articles">
+    readonly class?: string
 }
 
 const {
     id: articleId,
     isHero = false,
-    article
+    article,
+    class: classList
 } = Astro.props
 
 const {title, description, category, publishDate} = article;
@@ -19,7 +21,10 @@ const categoryEntry = await getEntry(category);
 const hasCategory = categoryEntry.id !== "empty";
 ---
 
-<article class="article" class:list={{"article--hero": isHero}}>
+<article class="article" class:list={[
+    {"article--hero": isHero},
+    classList
+]}>
     <h3 class="article__title">
         <a href={pathBuilder.singleArticle(articleId)}>{title}</a>
     </h3>
@@ -30,7 +35,9 @@ const hasCategory = categoryEntry.id !== "empty";
         <time
             class="article__publish-date"
             datetime={publishDate.toISOString()}
-        >{formatHumanDate(publishDate)}</time>
+            aria-label="Дата публикации"
+            title={publishDate.toISOString()}
+        >{formatHumanReadableRelativeDate(publishDate)}</time>
     </div>
 </article>
 

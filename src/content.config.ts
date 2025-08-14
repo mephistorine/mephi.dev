@@ -41,4 +41,22 @@ export const tags = defineCollection({
     })
 })
 
-export const collections = {articles, categories, tags};
+export const speeches = defineCollection({
+    loader: glob({
+        pattern: "**/[^_]*.md",
+        base: "./src/data/speeches",
+    }),
+    schema: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        conference: z.object({
+            name: z.string(),
+            url: z.string().url().optional(),
+            location: z.string()
+        }),
+        startDate: z.date().transform(date => new Date(date)),
+        endDate: z.date().transform(date => new Date(date)),
+    })
+})
+
+export const collections = {articles, categories, tags, speeches};

@@ -1,9 +1,10 @@
 ---
-import {getCollection, getEntry} from "astro:content";
-import {isToday, isYesterday} from "date-fns";
+import {getCollection} from "astro:content";
+import {isAfter, isToday, isYesterday} from "date-fns";
 import Article from "../components/Article.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import SpeechCard from "../components/SpeechCard.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {pathBuilder} from "../utils";
 
@@ -14,12 +15,17 @@ const tags = await getCollection("tags");
 const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
     return b.data.publishDate.getTime() - a.data.publishDate.getTime()
 })
+
+const speeches = (await getCollection("speeches", (speech) => {
+    return isAfter(speech.data.startDate, new Date())
+})).sort((a, b) => a.data.startDate.getTime() - b.data.startDate.getTime())
+
 ---
 
 <BaseLayout title="Главная">
     <Header/>
 
-    <main class="container">
+    <main class="container main-content">
         <section class="latest-article-section">
             <Article
                 id={firstArticle.id}
@@ -28,49 +34,54 @@ const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
             />
         </section>
 
-        <div class="content">
-            <section class="section section--articles">
-                <h2 class="section__title">Статьи</h2>
-                {otherArticles.map((article) => <Article id={article.id} article={article.data} />)}
+        <section class="section section--recent-events">
+            <h2 class="section__title">Ближайшие выступления</h2>
+
+            <div class="card-list">
+                {
+                    speeches.map((speech) => {
+                        return <SpeechCard id={speech.id} speech={speech.data} />
+                    })
+                }
+            </div>
+        </section>
+
+        <section class="section section--articles">
+            <h2 class="section__title">Статьи</h2>
+            {otherArticles.map((article) => <Article id={article.id} article={article.data} />)}
+        </section>
+
+        <aside class="sidebar">
+            <section class="section">
+                <h2 class="section__title">Категории</h2>
+                <ul class="categories">
+                    {categories.map((category) => {
+                        return <li><a href={pathBuilder.singleTag(category.data.slug)}>{category.data.name}</a></li>
+                    })}
+                </ul>
             </section>
 
-            <aside class="sidebar">
-                <section class="section">
-                    <h2 class="section__title">Категории</h2>
-                    <ul class="categories">
-                        {categories.map((category) => {
-                            return <li><a href={pathBuilder.singleTag(category.data.slug)}>{category.data.name}</a></li>
-                        })}
-                    </ul>
-                </section>
-                <section class="section">
-                    <h2 class="section__title">Метки</h2>
-                    <ul class="categories">
-                        {tags.map((tag) => {
-                            return <li><a href={pathBuilder.singleTag(tag.data.slug)}>{tag.data.name}</a></li>
-                        })}
-                    </ul>
-                </section>
-            </aside>
-        </div>
+            <section class="section">
+                <h2 class="section__title">Метки</h2>
+                <ul class="categories">
+                    {tags.map((tag) => {
+                        return <li><a href={pathBuilder.singleTag(tag.data.slug)}>{tag.data.name}</a></li>
+                    })}
+                </ul>
+            </section>
+        </aside>
     </main>
 
     <Footer />
 </BaseLayout>
 
 <style>
-    .latest-article-section {
-        margin-block: 7rem;
-    }
-
     .section {
         margin-block-end: 2rem;
     }
 
-    .section--articles {
-        display: flex;
-        flex-direction: column;
-        gap: 2.5rem;
+    .section--articles :global(.article:not(:last-child)) {
+        margin-block-end: 2.5rem;
     }
 
     .section__title {
@@ -83,22 +94,40 @@ const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
         margin-block-end: 1rem;
         display: flex;
         align-items: center;
-        gap: 5%;
+        gap: 2%;
     }
 
     .section__title::after {
         content: "";
         display: block;
         flex-grow: 1;
-        background-color: black;
+        background-color: light-dark(black, white);
         height: 1px;
         opacity: 0.3;
     }
 
-    .content {
+    .main-content {
         display: grid;
-        gap: 4rem;
-        grid-template-columns: 9fr 3fr;
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: auto auto 1fr;
+        gap: 1rem;
+    }
+
+    .latest-article-section {
+        margin-block: 7rem;
+        grid-column: 1/-1;
+    }
+
+    .section--recent-events {
+        grid-column: 1/-1;
+    }
+
+    .section--articles {
+        grid-column: 1/10;
+    }
+
+    .sidebar {
+        grid-column: 10/-1;
     }
 
     .categories {
@@ -108,5 +137,11 @@ const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
+    }
+
+    .card-list {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
     }
 </style>
