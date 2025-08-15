@@ -4,8 +4,9 @@
     --vw: calc(100vw - var(--sb));
     color-scheme: light dark;
     --primary-color: #8870FF;
-    --text-color: light-dark(#131313, #d9d9d9);
-    --bg-color: light-dark(#d9d9d9, #131313);
+    --text-color: light-dark(#222222, #d9d9d9);
+    --bg-color: light-dark(#ffffff, #131313);
+    scroll-behavior: smooth;
 }
 
 .container {
@@ -42,6 +43,39 @@ body {
 
 code, pre {
     font-family: "IBM Plex Mono", monospace;
+    tab-size: 4;
+}
+
+pre {
+    line-height: 1.3;
+    padding-block: 1rem;
+    border-radius: 0.5rem;
+    counter-reset: step;
+    counter-increment: step 0;
+    font-size: 0.9em;
+}
+
+.line::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    display: block;
+    translate: -150%;
+    opacity: 0.5;
+    font-variant-numeric: tabular-nums;
+}
+
+.line {
+    padding-inline-start: 2rem;
+    position: relative;
+    display: inline-block;
+    min-height: 1em;
+    width: 100%;
+    padding-inline: 3rem 1rem;
+}
+
+.line.highlighted {
+    background-color: light-dark(#ffffff1c, #ffffff1c);
 }
 
 a {
@@ -54,13 +88,25 @@ a:hover {
 }
 
 @media (prefers-color-scheme: dark) {
-    .astro-code,
-    .astro-code span {
-        color: var(--shiki-dark) !important;
+    .astro-code {
         background-color: var(--shiki-dark-bg) !important;
+    }
+
+    .astro-code,
+    .astro-code span:not(.line) {
+        color: var(--shiki-dark) !important;
         /* Optional, if you also want font styles */
         font-style: var(--shiki-dark-font-style) !important;
         font-weight: var(--shiki-dark-font-weight) !important;
         text-decoration: var(--shiki-dark-text-decoration) !important;
     }
+}
+
+.item-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }

@@ -1,0 +1,32 @@
+---
+import {getCollection, render} from "astro:content";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+    const speeches = await getCollection("speeches");
+    return speeches.map((speech) => {
+        return {
+            params: {slug: speech.id},
+            props: {speech}
+        }
+    })
+}
+
+const {speech} = Astro.props;
+const {title} = speech.data;
+const {Content} = await render(speech);
+---
+
+<BaseLayout title={title}>
+    <Header />
+    <main class="container">
+        <header>
+            <h1>{title}</h1>
+        </header>
+
+        <Content />
+    </main>
+    <Footer />
+</BaseLayout>

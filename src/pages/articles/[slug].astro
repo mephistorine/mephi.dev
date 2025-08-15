@@ -1,10 +1,11 @@
 ---
 import {Image} from "astro:assets";
-import type { CollectionEntry } from "astro:content";
+import {type CollectionEntry, getEntry, getEntries} from "astro:content";
 import {getCollection, render} from "astro:content";
 import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import {pathBuilder} from "../../utils";
 
 function calculateTimeToRead(article: CollectionEntry<'articles'>): number {
     const numWords = (article.body || "")
@@ -30,8 +31,11 @@ export async function getStaticPaths() {
 
 const {article} = Astro.props;
 let {Content, headings} = await render(article);
-const {title, publishDate, description, poster} = article.data
-const timeToRead = calculateTimeToRead(article)
+const {title, publishDate, description, poster, category, tags} = article.data
+const timeToRead = calculateTimeToRead(article);
+const categoryEntry = await getEntry(category);
+const hasCategory = categoryEntry.id !== "empty";
+const tagEntries = await getEntries(tags ?? []);
 ---
 
 <BaseLayout title={title} description={description}>
@@ -55,10 +59,13 @@ const timeToRead = calculateTimeToRead(article)
     <main class="container">
         <article class="article">
             <header class="article__header">
-                <div>
-                    Опубликовано
-                    <time class="article__publish-date" datetime={publishDate.toISOString()}>{publishDate.toLocaleDateString("ru", {dateStyle: "medium"})}</time>
-                    Читать <time datetime={`${timeToRead}m`} class="article__time-to-read">{timeToRead}</time> мин.
+                <div class="article__info">
+                    <span>
+                        Опубликовано
+                        <time class="article__publish-date" datetime={publishDate.toISOString()}>{publishDate.toLocaleDateString("ru", {dateStyle: "medium"})}</time>
+                        Читать <time datetime={`${timeToRead}m`} class="article__time-to-read">{timeToRead}</time> мин.
+                    </span>
+                    {hasCategory && <a href={pathBuilder.singleCategory(categoryEntry.data.slug)}>{categoryEntry.data.name}</a>}
                 </div>
                 <h1 class="article__title">{title}</h1>
                 {description && <p class="article__description">{description}</p>}
@@ -93,6 +100,16 @@ const timeToRead = calculateTimeToRead(article)
                 <Content />
             </div>
             <footer class="article__footer">
+                <section>
+                    <h3>Метки</h3>
+                    <ul class="item-list">
+                        {
+                            tagEntries.map((entry) => {
+                                return <li><a href={`/tags/${entry.id}`}>{entry.data.name}</a></li>
+                            })
+                        }
+                    </ul>
+                </section>
                 <section>
                     <h3>Похожие статьи</h3>
                 </section>
@@ -139,6 +156,11 @@ const timeToRead = calculateTimeToRead(article)
         grid-row: 3/-1;
     }
 
+    .article__info {
+        display: flex;
+        justify-content: space-between;
+    }
+
     .article__poster {
         margin: 0;
     }
@@ -158,6 +180,6 @@ const timeToRead = calculateTimeToRead(article)
     }
 
     .table-of-content__list-item {
-        padding-inline-start: calc(var(--depth) * 0.5rem);
+        padding-inline-start: calc(var(--depth, 1) * 1rem);
     }
 </style>

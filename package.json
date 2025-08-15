@@ -17,5 +17,8 @@
     },
     "engines": {
         "node": ">=24"
+    },
+    "devDependencies": {
+        "@shikijs/transformers": "^3.9.2"
     }
 }

@@ -24,22 +24,27 @@ function formatSpeechDate(startDate: Date, endDate: Date): string {
 ---
 
 <article class="speech-card">
-    <h3><a href={`/talks/${id}`}>{speech.title}</a></h3>
-    {speech.conference.url && <p><a href={speech.conference.url}>{speech.conference.name}</a></p>}
-    {!speech.conference.url && <p>{speech.conference.name}</p>}
-    <time>{formatSpeechDate(speech.startDate, speech.endDate)}</time>
-    <address>{speech.conference.location}</address>
+    <h3 class="speech-card__title"><a href={`/speeches/${id}`}>{speech.title}</a></h3>
+    {speech.conference.url && <p class="speech-card__conference-name"><a href={speech.conference.url}>{speech.conference.name}</a></p>}
+    {!speech.conference.url && <p class="speech-card__conference-name">{speech.conference.name}</p>}
+    <time class="speech-card__time" datetime={speech.startDate.toISOString()}>{formatSpeechDate(speech.startDate, speech.endDate)}</time>
+    <address class="speech-card__location">{speech.conference.location}</address>
 </article>
 
 <style>
     .speech-card {
         width: 15rem;
-        border: 1px solid #373636;
+        border: 1px solid #d5d5d5;
         padding: 1rem;
         border-radius: 0.5rem;
         display: flex;
         gap: 0.7rem;
         flex-direction: column;
         flex: none;
+    }
+
+    .speech-card__title,
+    .speech-card__conference-name {
+        margin: 0;
     }
 </style>

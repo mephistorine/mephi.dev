@@ -4,3 +4,9 @@
   slug: css
 - name: HTML
   slug: html
+- name: RxJS
+  slug: rxjs
+- name: JavaScript
+  slug: javascript
+- name: TypeScript
+  slug: typescript
