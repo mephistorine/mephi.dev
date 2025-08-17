@@ -1,0 +1,64 @@
+---
+
+---
+
+<div class="carousel">
+    <div class="carousel__content">
+        <slot />
+    </div>
+
+    <footer class="carousel__footer">
+        <slot name="footer-caption" />
+
+        <button class="carousel__prev-btn" type="button">Назад</button>
+        <button class="carousel__next-btn" type="button">Вперед</button>
+    </footer>
+</div>
+
+<style>
+    .carousel__content {
+        display: grid;
+        grid-auto-columns: 100%;
+        grid-auto-flow: column;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+    }
+
+    .carousel__footer {
+        padding-block: 0.5rem;
+        display: flex;
+        justify-content: end;
+        gap: 0.5rem;
+    }
+
+    .carousel__content > :global(*) {
+        scroll-snap-stop: always;
+        scroll-snap-align: center;
+    }
+
+    .carousel__content :global(img) {
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        object-position: center;
+    }
+</style>
+
+<script>
+    const carousels = document.querySelectorAll(".carousel")
+
+    for (const carouselEl of carousels) {
+        const prevBtnEl = carouselEl.querySelector(".carousel__prev-btn")
+        const nextBtnEl = carouselEl.querySelector(".carousel__next-btn")
+        const scrollContent = carouselEl.querySelector(".carousel__content")
+
+        prevBtnEl?.addEventListener("click", () => {
+            scrollContent?.scrollBy(carouselEl.clientWidth * -1, 0)
+        })
+
+        nextBtnEl?.addEventListener("click", () => {
+            scrollContent?.scrollBy(carouselEl.clientWidth, 0)
+        })
+    }
+</script>

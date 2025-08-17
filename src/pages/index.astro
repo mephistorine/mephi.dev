@@ -1,25 +1,25 @@
 ---
 import {getCollection} from "astro:content";
-import {isAfter, isToday, isYesterday} from "date-fns";
+import {Image} from "astro:assets";
+import {isAfter} from "date-fns";
 import Article from "../components/Article.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import SpeechCard from "../components/SpeechCard.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {pathBuilder} from "../utils";
+import samBulatovImg from "../data/articles/who-am-i/sam-bulatov.jpg";
 
-const articles = await getCollection("articles");
+const articles = await getCollection("articles", article => !article.data.isHidden);
 const categories = await getCollection("categories");
 const tags = await getCollection("tags");
 
-const [firstArticle, ...otherArticles] = articles.sort((a, b) => {
-    return b.data.publishDate.getTime() - a.data.publishDate.getTime()
-})
+const [firstArticle, ...otherArticles] = articles
+    .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
 
 const speeches = (await getCollection("speeches", (speech) => {
     return isAfter(speech.data.startDate, new Date())
 })).sort((a, b) => a.data.startDate.getTime() - b.data.startDate.getTime())
-
 ---
 
 <BaseLayout title="Главная">
@@ -31,6 +31,7 @@ const speeches = (await getCollection("speeches", (speech) => {
                 id={firstArticle.id}
                 isHero={true}
                 article={firstArticle.data}
+                prefetch={true}
             />
         </section>
 
@@ -51,25 +52,29 @@ const speeches = (await getCollection("speeches", (speech) => {
             {otherArticles.map((article) => <Article id={article.id} article={article.data} />)}
         </section>
 
-        <aside class="sidebar">
-            <section class="section">
-                <h2 class="section__title">Категории</h2>
-                <ul class="categories">
-                    {categories.map((category) => {
-                        return <li><a href={pathBuilder.singleTag(category.data.slug)}>{category.data.name}</a></li>
-                    })}
-                </ul>
-            </section>
+        <section class="section section--who-am-i">
+            <h2 class="section__title">Кто я?</h2>
+            <Image src={samBulatovImg} alt="Сэм сидит на ориной полке в Мезмае" widths={[276, 552]} />
+            <p>Привет, меня зовут Сэм Булатов! Я старший разработчик в <a href="https://www.tbank.ru/business/website-builder/" target="_blank">Конструкторе Сайтов Т-Банка</a>. В основном занимаюсь разработкой пользовательских интерфейсов, так же организую конференции и многое другое. Подробнее можно прочитать на странице «<a href={pathBuilder.whoAmI()}>Обо мне</a>». </p>
+        </section>
 
-            <section class="section">
-                <h2 class="section__title">Метки</h2>
-                <ul class="categories">
-                    {tags.map((tag) => {
-                        return <li><a href={pathBuilder.singleTag(tag.data.slug)}>{tag.data.name}</a></li>
-                    })}
-                </ul>
-            </section>
-        </aside>
+        <section class="section section--categories">
+            <h2 class="section__title">Категории</h2>
+            <ul class="categories">
+                {categories.map((category) => {
+                    return <li><a href={pathBuilder.singleTag(category.data.slug)}>{category.data.name}</a></li>
+                })}
+            </ul>
+        </section>
+
+        <section class="section categories--tags">
+            <h2 class="section__title">Метки</h2>
+            <ul class="categories">
+                {tags.map((tag) => {
+                    return <li><a href={pathBuilder.singleTag(tag.data.slug)}>{tag.data.name}</a></li>
+                })}
+            </ul>
+        </section>
     </main>
 
     <Footer />
@@ -106,28 +111,45 @@ const speeches = (await getCollection("speeches", (speech) => {
         opacity: 0.3;
     }
 
-    .main-content {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        grid-template-rows: auto auto 1fr;
-        gap: 1rem;
-    }
-
     .latest-article-section {
-        margin-block: 7rem;
         grid-column: 1/-1;
     }
 
-    .section--recent-events {
-        grid-column: 1/-1;
-    }
+    @media screen and (width >= 48em) {
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: auto auto 1fr;
+            gap: 1rem;
+        }
 
-    .section--articles {
-        grid-column: 1/10;
-    }
+        .latest-article-section {
+            margin-block: 7rem;
+        }
 
-    .sidebar {
-        grid-column: 10/-1;
+        .section.section--recent-events {
+            grid-column: 1/-1;
+        }
+
+        .section.section--articles {
+            grid-column: 1/10;
+        }
+
+        .section.section--who-am-i {
+            grid-column: 10/-1;
+        }
+
+        .section.section--categories {
+            grid-column: 10 / -1;
+        }
+
+        .section.categories--tags {
+            grid-column: 10 / -1;
+        }
+
+        .section.section--articles {
+            grid-row: 3 / span 3;
+        }
     }
 
     .categories {

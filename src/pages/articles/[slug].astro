@@ -7,7 +7,7 @@ import Header from "../../components/Header.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {pathBuilder} from "../../utils";
 
-function calculateTimeToRead(article: CollectionEntry<'articles'>): number {
+function calculateTimeToRead(article: CollectionEntry<"articles">): number {
     const numWords = (article.body || "")
         .replace(/.*\[(.*?)\].*/gm, "$1")
         .replace(/```.*?```/gms, "")
@@ -24,18 +24,19 @@ export async function getStaticPaths() {
     return articles.map((article) => {
         return {
             params: {slug: article.id},
-            props: {article}
-        }
-    })
+            props: {article},
+        };
+    });
 }
 
 const {article} = Astro.props;
-let {Content, headings} = await render(article);
-const {title, publishDate, description, poster, category, tags} = article.data
+const {Content, headings} = await render(article);
+const {title, publishDate, description, poster, category, tags} = article.data;
 const timeToRead = calculateTimeToRead(article);
 const categoryEntry = await getEntry(category);
 const hasCategory = categoryEntry.id !== "empty";
 const tagEntries = await getEntries(tags ?? []);
+const hasTags = tagEntries.length > 0;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -55,68 +56,79 @@ const tagEntries = await getEntries(tags ?? []);
         <meta name="twitter:site" content="@mephistorine">
     </Fragment>
 
-    <Header />
+    <Header/>
     <main class="container">
         <article class="article">
             <header class="article__header">
                 <div class="article__info">
                     <span>
                         Опубликовано
-                        <time class="article__publish-date" datetime={publishDate.toISOString()}>{publishDate.toLocaleDateString("ru", {dateStyle: "medium"})}</time>
-                        Читать <time datetime={`${timeToRead}m`} class="article__time-to-read">{timeToRead}</time> мин.
+                        <time class="article__publish-date"
+                              datetime={publishDate.toISOString()}>{publishDate.toLocaleDateString("ru", {dateStyle: "medium"})}</time>
+                        Читать <time datetime={`${timeToRead}m`}
+                                     class="article__time-to-read">{timeToRead}</time> мин.
                     </span>
-                    {hasCategory && <a href={pathBuilder.singleCategory(categoryEntry.data.slug)}>{categoryEntry.data.name}</a>}
+                    {hasCategory &&
+                        <a href={pathBuilder.singleCategory(categoryEntry.data.slug)}>{categoryEntry.data.name}</a>}
                 </div>
                 <h1 class="article__title">{title}</h1>
-                {description && <p class="article__description">{description}</p>}
-                {poster && <figure class="article__poster">
-                    <Image
-                        src={poster.url}
-                        alt={poster.alt}
-                        layout="constrained"
-                        class="article__poster-image"
-                    />
+                {description &&
+                    <p class="article__description">{description}</p>}
+                {poster &&
+                    <figure class="article__poster">
+                        <Image
+                            src={poster.url}
+                            alt={poster.alt}
+                            layout="constrained"
+                            class="article__poster-image"
+                        />
 
-                    {poster.author && <figcaption class="article__poster-caption">
-                        Автор фото
-                        <a href={poster.author.url}>{poster.author.name}</a>
-                    </figcaption>}
-                </figure>}
+                        {poster.author &&
+                            <figcaption class="article__poster-caption">
+                                Автор фото
+                                <a href={poster.author.url}>{poster.author.name}</a>
+                            </figcaption>}
+                    </figure>}
             </header>
             <aside class="article__sidebar">
                 <section class="table-of-content">
                     <h3>Содержание</h3>
                     <ul class="table-of-content__list">
                         {headings.map((heading) => {
-                            return <li class="table-of-content__list-item" style={{"--depth": heading.depth - 2}}><a href={`#${heading.slug}`}>{heading.text}</a></li>
+                            return <li class="table-of-content__list-item"
+                                    style={{"--depth": heading.depth - 2}}><a
+                                    href={`#${heading.slug}`}>{heading.text}</a>
+                                </li>;
                         })}
                     </ul>
                 </section>
-                <section>
+                <!--<section>
                     <h3>Свежие статьи</h3>
-                </section>
+                </section>-->
             </aside>
             <div class="article__content">
-                <Content />
+                <Content/>
             </div>
             <footer class="article__footer">
-                <section>
+                {hasTags && <section>
                     <h3>Метки</h3>
                     <ul class="item-list">
                         {
                             tagEntries.map((entry) => {
-                                return <li><a href={`/tags/${entry.id}`}>{entry.data.name}</a></li>
+                                return <li><a
+                                    href={`/tags/${entry.id}`}>{entry.data.name}</a>
+                                </li>;
                             })
                         }
                     </ul>
-                </section>
-                <section>
+                </section>}
+                <!--<section>
                     <h3>Похожие статьи</h3>
-                </section>
+                </section>-->
             </footer>
         </article>
     </main>
-    <Footer />
+    <Footer/>
 </BaseLayout>
 
 <style>
@@ -137,6 +149,10 @@ const tagEntries = await getEntries(tags ?? []);
 
     .article__content {
         grid-column: 5/-1;
+    }
+
+    .article__content :global(img) {
+        cursor: zoom-in;
     }
 
     .article__title {
@@ -183,3 +199,52 @@ const tagEntries = await getEntries(tags ?? []);
         padding-inline-start: calc(var(--depth, 1) * 1rem);
     }
 </style>
+
+<style is:global>
+    .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100dvw;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 0;
+    }
+
+    .lightbox__image {
+        height: 100%;
+        cursor: zoom-out;
+    }
+</style>
+
+<script>
+    const images = document.querySelectorAll(".article__content img");
+    for (const imageElement of images) {
+        imageElement.addEventListener("click", (event) => {
+            const {target} = event;
+            if ((!(target instanceof HTMLImageElement))) {
+                return;
+            }
+            const dialogEl = document.createElement("dialog");
+            dialogEl.open = true;
+            dialogEl.classList.add("lightbox");
+            const close = () => {
+                dialogEl.close();
+                dialogEl.remove();
+            }
+            const image = document.createElement("img");
+            image.classList.add("lightbox__image")
+            image.setAttribute("src", target.getAttribute("src") ?? "");
+            image.addEventListener("click", () => close(), {once: true});
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    close()
+                }
+            }, {once: true})
+            dialogEl.appendChild(image);
+            document.body.appendChild(dialogEl);
+        });
+    }
+</script>

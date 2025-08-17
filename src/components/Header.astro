@@ -7,14 +7,14 @@ import {pathBuilder} from "../utils";
 
 <header class="container">
     <div>
-        <a href="/">
+        <a href={pathBuilder.home()}>
             <Logo class="logo" />
         </a>
     </div>
 
     <nav>
         <ul>
-            <li><a href="/about">Обо мне</a></li>
+            <li><a href={pathBuilder.whoAmI()}>Обо мне</a></li>
         </ul>
     </nav>
 

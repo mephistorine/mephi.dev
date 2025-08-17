@@ -1,0 +1,16 @@
+---
+import {getCollection} from "astro:content";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const speeches = await getCollection("speeches");
+---
+
+<BaseLayout title="Выступления">
+    <Header />
+    <main class="container">
+        <h1>Выстулпения</h1>
+    </main>
+    <Footer />
+</BaseLayout>

@@ -7,13 +7,15 @@ type Props = {
     readonly isHero?: boolean
     readonly article: InferEntrySchema<"articles">
     readonly class?: string
+    readonly prefetch?: boolean
 }
 
 const {
     id: articleId,
     isHero = false,
     article,
-    class: classList
+    class: classList,
+    prefetch = false
 } = Astro.props
 
 const {title, description, category, publishDate} = article;
@@ -26,7 +28,8 @@ const hasCategory = categoryEntry.id !== "empty";
     classList
 ]}>
     <h3 class="article__title">
-        <a href={pathBuilder.singleArticle(articleId)}>{title}</a>
+        {prefetch && <a href={pathBuilder.singleArticle(articleId)} data-astro-prefetch>{title}</a>}
+        {!prefetch && <a href={pathBuilder.singleArticle(articleId)}>{title}</a>}
     </h3>
     {description && <p class="article__description">{description}</p>}
     <div class="article__info">
@@ -49,6 +52,7 @@ const hasCategory = categoryEntry.id !== "empty";
 
     .article__title {
         font-size: 2.1rem;
+        line-height: 1.3;
         margin: 0;
         margin-block-end: 1.5rem;
     }
@@ -72,12 +76,28 @@ const hasCategory = categoryEntry.id !== "empty";
         order: -1;
     }
 
-    .article--hero .article__title {
-        font-size: 4rem;
-        margin-block-end: 2rem;
+    @media screen and (width >= 22.5em) {
+        .article--hero .article__title {
+            font-size: 2rem;
+            margin-block-end: 1.5rem;
+        }
     }
 
-    .article--hero .article__description {
-        font-size: 1.4rem;
+    @media screen and (width >= 48em) {
+        .article--hero .article__description {
+            font-size: 1.4rem;
+        }
+
+        .article--hero .article__title {
+            font-size: 4rem;
+            margin-block-end: 2rem;
+        }
+    }
+
+    @media screen and (width >= 64em) {
+        .article--hero .article__title {
+            font-size: 4rem;
+            margin-block-end: 2rem;
+        }
     }
 </style>

@@ -1,0 +1,15 @@
+---
+type Props = {
+    readonly id: string
+    readonly level: number
+    readonly slug: string
+}
+
+const {id, level, slug} = Astro.props;
+const Tag = `h${level}`
+---
+
+<Tag id={id}>
+    <slot />
+    <a href={`#${slug}`}>#</a>
+</Tag>

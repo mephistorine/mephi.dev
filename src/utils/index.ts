@@ -21,4 +21,5 @@ export const pathBuilder = {
     singleTag: (slug: string) => `/tags/${slug}`,
     rss: () => "/rss.xml",
     search: (query?: string) => `/search${query ? `?q=${encodeURIComponent(query)}` : ""}`,
+    whoAmI: () => "/who-am-i"
 };

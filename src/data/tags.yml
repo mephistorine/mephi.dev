@@ -10,3 +10,7 @@
   slug: javascript
 - name: TypeScript
   slug: typescript
+- name: Примеры из жизни
+  slug: case-studies
+- name: Web API
+  slug: web-api

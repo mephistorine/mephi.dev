@@ -4,7 +4,7 @@ import {z} from "zod";
 
 export const articles = defineCollection({
     loader: glob({
-        pattern: "**/[^_]*.md",
+        pattern: "**/[^_]*.(md|mdoc)",
         base: "./src/data/articles",
     }),
     schema: ({image}) => z.object({
@@ -14,6 +14,7 @@ export const articles = defineCollection({
         // updateDate: z.date().transform(date => new Date(date)),
         category: reference("categories"),
         tags: z.array(reference("tags")).optional(),
+        isHidden: z.boolean().optional(),
         poster: z.object({
             url: image(),
             alt: z.string(),
@@ -43,7 +44,7 @@ export const tags = defineCollection({
 
 export const speeches = defineCollection({
     loader: glob({
-        pattern: "**/[^_]*.md",
+        pattern: "**/[^_]*.(md|mdoc)",
         base: "./src/data/speeches",
     }),
     schema: z.object({

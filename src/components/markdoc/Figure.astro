@@ -1,0 +1,31 @@
+---
+// src/components/MarkdocFigure.astro
+import { Image } from "astro:assets";
+
+interface Props {
+    src: ImageMetadata | string;
+    alt: string;
+    width: number;
+    height: number;
+}
+
+const { src, alt, width, height } = Astro.props;
+---
+
+<figure>
+    <Image {src} {alt} {width} {height}  />
+    <figcaption>
+        <slot />
+    </figcaption>
+</figure>
+
+<style>
+    figcaption {
+        font-size: 0.9em;
+        opacity: 0.7;
+    }
+
+    figcaption > :global(*) {
+        margin: 0;
+    }
+</style>
