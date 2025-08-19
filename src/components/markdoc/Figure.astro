@@ -7,13 +7,15 @@ interface Props {
     alt: string;
     width: number;
     height: number;
+    loading?: "eager" | "lazy" | null;
+    fetchpriority?: "low" | "high" | "auto" | null;
 }
 
-const { src, alt, width, height } = Astro.props;
+const { src, alt, width, height, loading, fetchpriority } = Astro.props;
 ---
 
 <figure>
-    <Image {src} {alt} {width} {height}  />
+    <Image {src} {alt} {width} {height} {loading} {fetchpriority}  />
     <figcaption>
         <slot />
     </figcaption>

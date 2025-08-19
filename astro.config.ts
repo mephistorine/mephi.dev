@@ -27,5 +27,6 @@ export default defineConfig({
     prefetch: true,
     redirects: {
         "/who-am-i": "/articles/who-am-i"
-    }
+    },
+    scopedStyleStrategy: "where"
 });

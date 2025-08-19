@@ -35,7 +35,10 @@ export default defineMarkdocConfig({
                 height: {
                     type: String,
                 },
-                caption: {
+                loading: {
+                    type: String,
+                },
+                fetchpriority: {
                     type: String,
                 },
                 ...nodes.image.attributes
