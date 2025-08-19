@@ -9,6 +9,8 @@ type Props = {
     description?: string
 }
 
+const isProd = import.meta.env.NODE_ENV === "production";
+
 const {title, description, lang = "ru"} = Astro.props;
 ---
 
@@ -26,6 +28,8 @@ const {title, description, lang = "ru"} = Astro.props;
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet">
     {description && <meta name="description" content={description}>}
+
+    {isProd && <script defer src="https://umami.mephi.dev/script.js" data-website-id="9ebad349-8185-44a1-8a9a-dbdb655fba8b"></script>}
 
     <slot name="head" />
 

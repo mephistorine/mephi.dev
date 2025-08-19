@@ -28,5 +28,5 @@ export default defineConfig({
     redirects: {
         "/who-am-i": "/articles/who-am-i"
     },
-    scopedStyleStrategy: "where"
+    scopedStyleStrategy: "where",
 });
